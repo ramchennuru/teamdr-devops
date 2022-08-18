@@ -37,10 +37,10 @@ jobs:
           password: ${{ secrets.PWD}}
       - name: yarn version
         run: yarn -v
-      - name: yarn build
-        run: yarn build
       - name: Yarn start
         run: yarn start
+      - name: yarn build
+        run: yarn build
       - name: docker installation
         run: docker -v
       #     - name: docker login
