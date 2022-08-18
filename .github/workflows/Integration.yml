@@ -35,9 +35,9 @@ jobs:
         with:
           username: ${{ secrets.USERNAME }}
           password: ${{ secrets.PWD}}
-      - name: yarn version
-        run: yarn -v
-      - name: Yarn start
+      - name: yarn install
+        run: yarn install
+      - name: yarn start
         run: yarn start
       - name: yarn build
         run: yarn build
