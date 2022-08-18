@@ -1,0 +1,319 @@
+# This is a basic workflow to help you get started with Actions
+
+name: Continous Integration
+
+# Controls when the workflow will run
+on:
+  # Triggers the workflow on push or pull request events but only for the main branch
+  push:
+    branches: [ main ]
+  pull_request:
+    branches: [ main ]
+
+  # Allows you to run this workflow manually from the Actions tab
+  workflow_dispatch:
+
+# A workflow run is made up of one or more jobs that can run sequentially or in parallel
+jobs:
+  # This workflow contains a single job called "build"
+  build:
+    # The type of runner that the job will run on
+    runs-on: ubuntu-latest
+
+    # Steps represent a sequence of tasks that will be executed as part of the job
+    steps:
+      # Checks-out your repository under $GITHUB_WORKSPACE, so your job can access it
+      - uses: actions/checkout@v3
+      - uses: actions/setup-java@v3
+        with:
+          distribution: 'temurin' # See 'Supported distributions' for available options
+      - run: yarn --version
+      - uses: actions/checkout@v2
+
+      - name: check npm version
+        run: npm -v
+      - name: check file structure
+        run: ls -al
+      - name: Login to DockerHub
+        uses: docker/login-action@v1
+        with:
+          username: ${{ secrets.USERNAME }}
+          password: ${{ secrets.PWD}}
+      - name: yarn version
+        run: yarn -v
+      - name: yarn build
+        run: yarn build
+      - name: Yarn start
+        run: yarn start
+      - name: docker installation
+        run: docker -v
+      #     - name: docker login
+      #        run: docker login -u  ${{ secrets.DOCKERHUB_USERNAME }} -p ${{ secrets.DOCKERHUB_PASSWORD }}
+
+      - name: docker images
+        run: docker images -a
+      - name: docker tag
+        run: docker build  -t  . ramr161189/kanban-teamdr.v2
+      - name: docker push image
+        run: docker push  ramr161189/kanban-teamdr.v2
+
+
+
+
+          #       - name: 'Run az commands'
+          #         run: |
+          #           az account show
+          #           az group list
+          #           pwd
+          #
+          #      - name: Log in with Azure
+          #        uses: azure/login@v1
+          #        with:
+          #          creds: '${{ secrets.AZURE_CREDENTIALS }}'
+          #
+          #
+          #
+          #      - name: Login to DockerHub
+          #        uses: docker/login-action@v1
+          #        with:
+          #          username: ${{ secrets.DOCKERHUB_USERNAME }}
+          #          password: ${{ secrets.DOCKERHUB_password}}
+          #
+          #      - name: gradlew build
+          #        run: gradle build
+          #
+          #      -  name: Build and push
+          #         uses: docker/build-push-action@v2
+          #         with:
+
+          #           context: .
+          #           push: true
+          #           tags: user/app:latest
+
+          #       - uses: azure/aks-set-context@v1
+          #         with:
+          #           creds: '${{ secrets.AZURE_CREDENTIALS }}'
+          #           cluster-name: githubrg
+          #           resource-group: githubrg
+          #
+          #     # Create namespace if doesn't exist
+          #       - run: |
+        #           kubectl create namespace githubrg --dry-run=client -o json | kubectl apply -f -
+
+
+  #       - name: 'Az CLI login'
+  #         uses: azure/login@v1
+  #         with:
+  #           client-id: ${{ secrets.AZURE_CLIENT_ID }}
+  #           tenant-id: ${{ secrets.AZURE_TENANT_ID }}
+  #           subscription-id: ${{ secrets.AZURE_SUBSCRIPTION_ID }}
+
+#       - name: 'Run az commands'
+#         run: |
+#           az account show
+#           az group list
+#           pwd
+# #       - name: gradle build
+# #         run: gradle build
+#      - name: gradlew build
+#        run: ./gradlew build
+#      - name: docker version & list images
+#        run: |
+#          docker -v
+#          docker images -a
+#      - name: docker build
+#        run: docker build . -t demo-kotlin2:2.0
+#
+##       - run: |
+##           kubectl apply -f .
+##           kubectl get pods
+#
+#
+#      - name: list images
+#        if: always()
+#        run: |
+#          docker images -a
+##       - name: docker login
+##         if: always()
+##         run: docker login -u  ${{ secrets.DOCKERHUB_USERNAME }} -p ${{ secrets.DOCKERHUB_password }}
+#
+#
+#      # Runs a single command using the runners shell
+#      - name: Run a one-line script
+#        run: echo Hello, world!
+#
+#      # Runs a set of commands using the runners shell
+#      - name: Run a multi-line script
+#        run: |
+#          echo Add other actions to build,
+#          echo test, and deploy your project.
+#
+#      - name: Login to DockerHub
+#        uses: docker/login-action@v1
+#        with:
+#          username: ${{ secrets.DOCKERHUB_USERNAME }}
+#          password: ${{ secrets.DOCKERHUB_password}}
+#
+#      -  name: Build and push
+#         uses: docker/build-push-action@v2
+#         with:
+#          push: true
+#          tags: user/app:latest
+#
+##       - name: ls -al
+##         run: ls -al
+##       - name: gradlew build
+##         run: gradle build
+#
+#      -  name: Build and push
+#         uses: docker/build-push-action@v2
+#         with:
+#          push: true
+#          tags: user/app:latest
+#
+#  AutomatedDeploy:
+#    runs-on: ubuntu-latest
+#    environment: production
+#    steps:
+#      - name: deploy
+#        run: echo "helloworld"
+#
+#  deploy-play-store:
+#    needs: [build]
+#    runs-on: ubuntu-latest
+#    steps:
+#      # 1
+##       - uses: actions/download-artifact@master
+#
+##          context: .
+##          push: true
+##          tags: shan0809/app:latest
+##
+###       name: Build and push
+###         uses: docker/build-push-action@v2
+###         with:
+###           context: .
+###           push: true
+###           tags: user/app:latest
+##
+##      - uses: azure/aks-set-context@v1
+##        with:
+##          creds: '${{ secrets.AZURE_CREDENTIALS }}'
+##          cluster-name: githubrg
+##          resource-group: githubrg
+##
+##    # Create namespace if doesn't exist
+##      - run: |
+##          kubectl create namespace githubrg --dry-run=client -o json | kubectl apply -f -
+##
+##
+###       - name: 'Az CLI login'
+###         uses: azure/login@v1
+###         with:
+###           client-id: ${{ secrets.AZURE_CLIENT_ID }}
+###           tenant-id: ${{ secrets.AZURE_TENANT_ID }}
+###           subscription-id: ${{ secrets.AZURE_SUBSCRIPTION_ID }}
+##
+##      - name: 'Run az commands'
+##        run: |
+##          az account show
+##          az group list
+##          pwd
+###       - name: gradle build
+###         run: gradle build
+##      - name: gradlew build
+##        run: ./gradlew build
+##      - name: docker version & list images
+##        run: |
+##          docker -v
+##          docker images -a
+##      - name: docker build
+##        run: docker build . -t demo-kotlin2:2.0
+##
+##      - run: |
+##          kubectl apply -f .
+##          kubectl get pods
+##
+##
+##      - name: list images
+##        if: always()
+##        run: |
+##          docker images -a
+###       - name: docker login
+###         if: always()
+###         run: docker login -u  ${{ secrets.DOCKERHUB_USERNAME }} -p ${{ secrets.DOCKERHUB_password }}
+##
+##
+##      # Runs a single command using the runners shell
+##      - name: Run a one-line script
+##        run: echo Hello, world!
+##
+##      # Runs a set of commands using the runners shell
+##      - name: Run a multi-line script
+##        run: |
+##          echo Add other actions to build,
+##          echo test, and deploy your project.
+##
+##      - name: Login to DockerHub
+##        uses: docker/login-action@v1
+##        with:
+##          username: ${{ secrets.DOCKERHUB_USERNAME }}
+##          password: ${{ secrets.DOCKERHUB_password}}
+##
+##      -  name: Build and push
+##         uses: docker/build-push-action@v2
+##         with:
+##          push: true
+##          tags: user/app:latest
+##
+###       - name: ls -al
+###         run: ls -al
+###       - name: gradlew build
+###         run: gradle build
+##
+##      -  name: Build and push
+##         uses: docker/build-push-action@v2
+#
+##         with:
+##          push: true
+##          tags: user/app:latest
+##
+##  deploy-play-store:
+##    needs: [build]
+##    runs-on: ubuntu-latest
+##    steps:
+##      # 1
+###       - uses: actions/download-artifact@master
+###         with:
+###           name: release.apk
+###       - uses: actions/download-artifact@master
+###         with:
+###           name: mapping.txt
+##      - name: Run a multi-line script
+##        run: |
+##          echo Add other actions to build,
+##          echo test, and deploy your project.
+##
+###   deploy-play-store2:
+###     runs-on: ubuntu-latest
+###     steps:
+##
+###       - uses: actions/checkout@v2
+##
+##      - name: Login to DockerHub
+##        uses: docker/login-action@v1
+##        with:
+##          username: ${{ secrets.DOCKERHUB_USERNAME }}
+##          password: ${{ secrets.DOCKERHUB_password}}
+##
+###       - name: ls -al
+###         run: ls -al
+###       - name: gradlew build
+###         run: gradle build
+##
+##      -  name: Build and push
+##         uses: docker/build-push-action@v2
+##         with:
+##          push: true
+##          tags: user/app:latest
+##
