@@ -1,0 +1,159 @@
+name: 'Terraform'
+
+on:
+  push:
+    branches:
+      - main
+  pull_request:
+
+jobs:
+  terraform:
+    name: 'Terraform'
+    env:
+      AWS_ACCESS_KEY_ID = "ASIAXD5OMAD6MGCVICE7"
+      AWS_SECRET_ACCESS_KEY = "bc2vTS0FMw30HD85hfeJzPmbN2er/6Gr4DgOgsVi"
+      AWS_SESSION_TOKEN = "IQoJb3JpZ2luX2VjEPD//////////wEaDGV1LWNlbnRyYWwtMSJHMEUCICk5bglDQ3En8V9JclTz7DbLL9+n5NqOZpa8igfaeEuwAiEA/gJu5VSEEO/yfVvX4op6behssCUo4tOjydM0AqsR7WQqrwMIWRAAGgw0ODk0NTUwOTE5NjQiDMJTOhC/FZ00HeCh7yqMAxq7HOTHi//n3MTtWEELfjR0hJc5Lh+o4cpHfCmxResGdMRgDwUFl5FgeQFFmHjuluXlJa0XjItwVxJx8kBN4hWIND70NveHgPB1PSMBv20Olj83efcZpElVWzsVIRv3KCbQLGTCL6yztb3SPArWPSgQyqVWR0GvVGlJusXr4C+UiUl6o2zZwAEsdiGMY0T9mgjLZq3sWHPfxxOQ+6GxNgv7UmMSqSQ0afG2DLVCUv9nYlKWcFgfLUW0EXTT7wWMVhDte4HhjbRJkbcCZ5OK0aa10IfNsz8WhDIhTELlKfkrOEOiJ66y5isALhdBvGsQPgIg37FR2Z/ZcOM4FEPoOsGI1xirpJMVbdhX1IBHcl3oxsAIDo/nfHd2ZOn25PAw4vHoXU4XGJLJ1aZ8rvpwXpFvzc+a69mtlkZaTJGI0vwSquJ++DzHMI0XvX3ZtJ14akI5TdtiwUgQBD0INQzQUgnSKa9ALss2Yja8juGOBPyenNIdK0UxtDAfhP/xlXEOJB4gOohpdZgQVEr4kjCF6tKXBjqmAbLwy+lsnZ7PfsfaQDqhhLgZft4T1Nj1c9xd8qqdHLIAdRhNEg6UK1YjhfBxVLmW8ef3xtNYzkh6Ay1rTmfx7IH+O0QXut4xKppRNCgjPMNJl99jGhsBvyino/roRHodkC3cgf7LpJcygnVj+cKWpuch0RoP/yETE1r0G72mGY67GPINu0Ql7dvL2LSH10JCG5nua/Taa5fWChRT1GiryCr6c40MX7c="
+
+
+
+    #      working-directory: ${{ env.tf_actions_working_dir }}
+    runs-on: ubuntu-latest
+    environment: production
+
+    # Use the Bash shell regardless whether the GitHub Actions runner is ubuntu-latest, macos-latest, or windows-latest
+    defaults:
+      run:
+        shell: bash
+        working-directory: terraform
+
+
+    steps:
+      # Checkout the repository to the GitHub Actions runner
+      - name: Checkout
+        uses: actions/checkout@v2
+      #       - uses: hashicorp/setup-terraform@v2
+
+      #       - name: Terraform fmt
+      #         id: fmt
+      #         run: terraform fmt -check
+      #         continue-on-error: true
+
+      #      - name: Create Dir
+      #        run: |
+      #          ls -al
+      #          pwd
+      #          if [ -d "/home/ubuntu/" ]; then
+      #            echo "directory exists"
+      #          else
+      #            echo "directory doesn't exist creating it"
+      #            pwd
+      #          fi
+
+      - name: 'Install pre-reqs'
+        run: |
+          wget https://github.com/terraform-linters/tflint/releases/download/v0.25.0/tflint_linux_amd64.zip
+          unzip tflint_linux_amd64.zip
+          mv tflint /usr/local/bin
+          curl -SL "https://releases.hashicorp.com/terraform/1.0.8/terraform_1.0.8_linux_amd64.zip" --output terraform.zip
+          echo "${TERRAFORM_DOWNLOAD_SHA} terraform.zip"
+          unzip "terraform.zip"
+          mv terraform /usr/local/bin
+          terraform --version
+          rm terraform.zip
+
+      - name: Terraform Init
+        id: init
+        run: terraform init
+
+      - name: Terraform Validate
+        id: validate
+        run: terraform validate -no-color
+
+      - name: Terraform Plan
+        id: plan
+        #        env: integration
+        run: terraform plan -no-color
+        continue-on-error: true
+      - name: Terraform Apply
+        id: apply
+        run: terraform apply -auto-approve
+
+#      - uses: actions/github-script@v6
+##        if: github.event_name == 'pull_request'
+#        env:
+#          PLAN: "terraform\n${{ steps.plan.outputs.stdout }}"
+#        with:
+#          script: |
+#            const output = `#### Terraform Format and Style 🖌\`${{ steps.fmt.outcome }}\`
+#            #### Terraform Initialization ⚙️\`${{ steps.init.outcome }}\`
+#            #### Terraform Validation 🤖\`${{ steps.validate.outcome }}\`
+#            <details><summary>Validation Output</summary>
+#
+#            \`\`\`\n
+#            ${{ steps.validate.outputs.stdout }}
+#            \`\`\`
+#
+#            </details>
+#
+#            #### Terraform Plan 📖\`${{ steps.plan.outcome }}\`
+#
+#            <details><summary>Show Plan</summary>
+#
+#            \`\`\`\n
+#            ${process.env.PLAN}
+#            \`\`\`
+#
+#            </details>
+#
+#            *Pusher: @${{ github.actor }}, Action: \`${{ github.event_name }}\`, Working Directory: \`${{ env.tf_actions_working_dir }}\`, Workflow: \`${{ github.workflow }}\`*`;
+#
+#            github.rest.issues.createComment({
+#              issue_number: context.issue.number,
+#              owner: context.repo.owner,
+#              repo: context.repo.repo,
+#              body: output
+#            })
+#
+#      - name: 'Terraform Format'
+#        uses: hashicorp/terraform-github-actions@master
+#        with:
+#          tf_actions_version: 0.14.8
+#          tf_actions_subcommand: 'fmt'
+#          tf_actions_working_dir: "./terraform"
+#
+#      - name: 'Terraform Init'
+#        uses: hashicorp/terraform-github-actions@master
+#        with:
+#          tf_actions_version: 0.14.8
+#          tf_actions_subcommand: 'init'
+#          tf_actions_working_dir: "terraform"
+#
+#      - name: 'Terraform Validate'
+#        uses: hashicorp/terraform-github-actions@master
+#        with:
+#          tf_actions_version: 0.14.8
+#          tf_actions_subcommand: 'validate'
+#          tf_actions_working_dir: "terraform"
+#
+#      - name: 'Terraform Plan'
+#        uses: hashicorp/terraform-github-actions@master
+#        with:
+#          tf_actions_version: 0.14.8
+#          tf_actions_subcommand: 'plan'
+#          tf_actions_working_dir: "terraform"
+#
+#      - name: Terraform Apply
+#        if: github.ref == 'refs/heads/main'
+#        uses: hashicorp/terraform-github-actions@master
+#        with:
+#          tf_actions_version: 0.14.8
+#          tf_actions_subcommand: 'apply'
+#          tf_actions_working_dir: "terraform"
+#
+#      - name: Terraform Destroy
+#        if: github.ref == 'refs/heads/main'
+#        uses: hashicorp/terraform-github-actions@master
+#        with:
+#            tf_actions_version: 0.14.8
+#            tf_actions_subcommand: 'destroy'
+#            tf_actions_working_dir: "terraform"
