@@ -49,17 +49,9 @@ jobs:
       - name: docker images
         run: docker images -a
       - name: docker tag
-        run: docker build -t ramr161189/kanban-teamdr.v2 .
+        run: docker build . --platform=linux/amd64 -t ramr161189/kanban-teamdr.v2
       - name: docker push image
         run: docker push  ramr161189/kanban-teamdr.v2
-      - name: Deploy contianer
-        run: kubectl apply -f deployment.yml
-      - name: services
-        run: kubectl apply -f service.yml
-      - name: get services
-        run: kubectl get svc
-      - name: run locally
-        run: minikube service kanban-service
 
 
 
