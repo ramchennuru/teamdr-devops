@@ -1,0 +1,19 @@
+apiVersion: apps/v1
+kind: Deployment
+metadata:
+  name: kanban
+spec:
+  replicas: 2
+  selector:
+    matchLabels:
+      app: kanban-pod
+  template:
+    metadata:
+      labels:
+        app: kanban-pod
+    spec:
+      containers:
+        - name: kanban
+          image: ramr161189/kanban-teamdr.v2
+          ports:
+            - containerPort: 80
