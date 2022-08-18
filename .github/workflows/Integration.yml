@@ -49,7 +49,7 @@ jobs:
       - name: docker images
         run: docker images -a
       - name: docker tag
-        run: docker build  -t  . ramr161189/kanban-teamdr.v2
+        run: docker build -t ramr161189/kanban-teamdr.v2 .
       - name: docker push image
         run: docker push  ramr161189/kanban-teamdr.v2
 
