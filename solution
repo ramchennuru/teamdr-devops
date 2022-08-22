@@ -152,3 +152,4 @@ It might take about 20-25 mins for the cluster creation, once the cluster setup 
 **Challenge faced:**   
 **Challenge-1:** Pods showing 'CrashLoopBackOff' state after deploying the k8s manifest.      
 **Troubleshooting steps:**    
+    >  docker build . --platform=linux/amd64 -t kanban-teamdr.v2
